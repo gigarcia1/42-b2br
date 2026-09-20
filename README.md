@@ -61,6 +61,40 @@ Both are Mandatory Access Control (MAC) systems that provide an extra layer of s
     ```
 5.  Enter the password for the user when prompted.
 
+## Further instructions and Useful Commands
+
+### 1. Password Policy Management
+The system enforces strict password rules: a 30-day expiration, a minimum of 2 days between changes, a 7-day warning period, and strict character complexity limits[cite: 1].
+*   **Package Required:** `sudo apt install libpam-pwquality`
+*   **Expiration Configuration:** Edit `/etc/login.defs` (Set `PASS_MAX_DAYS 30`, `PASS_MIN_DAYS 2`, `PASS_WARN_AGE 7`)[cite: 1].
+*   **Complexity Configuration:** Edit `/etc/pam.d/common-password` (Enforces the 10-character minimum, uppercase, lowercase, numbers, and rejects 3 consecutive identical characters)[cite: 1].
+*   **Verify User Expiration:** `chage -l <username>`
+
+### 2. Firewall (UFW)
+The UFW firewall is active on startup and restricts all incoming connections except for the mandated SSH port[cite: 1].
+*   **Check Status & Rules:** `sudo ufw status verbose`
+*   **Allow Port:** `sudo ufw allow 4242`
+*   **Delete Rule:** `sudo ufw status numbered` followed by `sudo ufw delete <rule_number>`
+
+### 3. Sudo Configuration
+Authentication is limited to 3 attempts, requires a secure TTY session, restricts available executable paths, and logs all inputs/outputs[cite: 1].
+*   **Sudoers File Editing:** Execute `sudo visudo` to safely edit permissions and defaults.
+*   **Logs Directory:** All actions are systematically stored in `/var/log/sudo/`[cite: 1].
+*   **View Sudo Logs:** `sudo cat /var/log/sudo/sudo.log`
+
+### 4. User and Group Management
+*   **Create New User:** `sudo adduser <username>`
+*   **Create New Group:** `sudo groupadd <groupname>`
+*   **Add User to Group:** `sudo usermod -aG <groupname> <username>`
+*   **Check User Groups:** `groups <username>`
+*   **List Group Members:** `getent group <groupname>`
+
+### 5. Cron & Monitoring Script
+A Bash script (`monitoring.sh`) executes every 10 minutes to broadcast real-time system metrics to all active terminals via the `wall` command[cite: 1].
+*   **Edit Cron Jobs:** `sudo crontab -u root -e`
+*   **Cron Syntax (Every 10 mins):** `*/10 * * * * bash /path/to/monitoring.sh`
+*   **Stop Execution (During Evaluation):** Remove the line via `crontab -e` or temporarily disable the daemon with `sudo systemctl stop cron`.
+
 ## Resources
 *   [Debian Official Documentation](https://www.debian.org/doc/)
 *   [LVM Administrator's Guide](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_and_managing_logical_volumes/index)
